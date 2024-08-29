@@ -1,6 +1,5 @@
 package com.security.security.auth;
 
-import com.security.security.classes.AuthenticateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

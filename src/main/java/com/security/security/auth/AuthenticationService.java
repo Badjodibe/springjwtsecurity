@@ -32,7 +32,7 @@ public class AuthenticationService {
                 .lastname(registerRequest.getLastname())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.User )
+                .role(Role.User)
                 .build();
 
         userRepository.save(user);

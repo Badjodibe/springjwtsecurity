@@ -2,8 +2,6 @@ package com.security.security.classes;
 
 import jakarta.persistence.*;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,15 +9,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Setter
-@Getter
+
 @Entity
 @Table(name = "users")
 @Builder
 public class User implements UserDetails {
     @Id
-    private Long id;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "firstname")
     private String firstname;
     @Column(name = "lastname")
@@ -29,8 +27,60 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     @Enumerated(value = EnumType.STRING)
     private Role role;
+
+    public User() {
+
+    }
 
     public User(Long id, String firstname, String lastname, String email, String password, Role role) {
         this.id = id;
@@ -49,7 +99,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.firstname;
+        return this.email;
     }
 
     @Override
@@ -71,5 +121,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 
 }

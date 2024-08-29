@@ -1,26 +1,29 @@
 package com.security.security.configuration;
 
-import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final JWTAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider autheticationProvider;
-
-    public SecurityConfiguration(JWTAuthenticationFilter jwtAuthFilter, AuthenticationProvider autheticationProvider) {
+    private  final CustomAccessDeniedHandler accessDeniedHandler;
+    public SecurityConfiguration(
+            JWTAuthenticationFilter jwtAuthFilter, AuthenticationProvider autheticationProvider, CustomAccessDeniedHandler accessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.autheticationProvider = autheticationProvider;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
     /*
     * The security of the application is configured here
@@ -38,9 +41,19 @@ public class SecurityConfiguration {
                .csrf(
                        AbstractHttpConfigurer::disable
                )
-               .sessionManagement(
-                       sessionManagement -> sessionManagement
-                               .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+               .cors(
+                       AbstractHttpConfigurer::disable
+               )
+               .authorizeHttpRequests(
+                       http -> http
+                               .requestMatchers("/api/v1/auth/**")
+                               .permitAll()
+                               .anyRequest()
+                               .authenticated()
+               )
+               .exceptionHandling(
+                       e -> e.accessDeniedHandler(accessDeniedHandler)
+                               .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN))
                )
                .authenticationProvider(
                        autheticationProvider

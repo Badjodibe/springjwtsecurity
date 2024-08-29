@@ -19,6 +19,13 @@ import java.io.IOException;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final  JWTService jwtService;
     private final UserDetailsService userDetailsService;
+
+    /**
+     *
+     * @param jwtService
+     * @param userDetailsService
+     *
+     */
     @Autowired
     public JWTAuthenticationFilter(JWTService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
@@ -38,6 +45,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final  String email;
+        /*
+         * Return null if the authorization information in header is null or it is not begin with Bearer
+         */
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
             return;
@@ -45,12 +55,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         // Get the jwt and also the mail associate with this email
         jwt = authHeader.substring(7);
         email = jwtService.extractEmail(jwt);
-        // The mail is not null and there is an authentication for this email
+        // The email is not null and there is an authentication for this email
         if(email!=null && SecurityContextHolder.getContext().getAuthentication() == null){
             // Get the user by it email
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             // Check if its token is valid
-            if (jwtService.isTokenValidated(jwt, userDetails)){
+            if(jwtService.isTokenValidated(jwt, userDetails)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
